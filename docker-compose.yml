@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Nginx
+  nginx:
+    build:
+      context: ./.docker/nginx
+      args:
+        IMAGE_NAME: nginx
+    volumes:
+      - ".:/var/www/public:ro"
+    expose:
+      - "80"
+    depends_on:
+      - php
+    ports:
+      - "8080:80"
+      - "447:443"
+    networks:
+      - app-network
+
+  # PHP-FPM
+  php:
+    build:
+      context: ./.docker/php
+      target: local
+      args:
+        IMAGE_NAME: php
+    volumes:
+      - .:/var/www/public:cached
+    expose:
+      - "9000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
